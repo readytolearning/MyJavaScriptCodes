@@ -1,0 +1,57 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.7.7/xlsx.full.min.js"></script>
+<script>
+   function handleFile(e) {
+     //Get the files from Upload control
+        var files = e.target.files;
+        var i, f;
+     //Loop through files
+        for (i = 0, f = files[i]; i != files.length; ++i) {
+            var reader = new FileReader();
+            var name = f.name;
+            reader.onload = function (e) {
+                var data = e.target.result;
+
+                var result;
+                var workbook = XLSX.read(data, { type: 'binary' });
+                
+                var sheet_name_list = workbook.SheetNames;
+				console.log(sheet_name_list);
+              /*  sheet_name_list.forEach(function (y) { 
+					
+                    var roa = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+                    if (roa.length > 0) {
+                        result = roa;
+                    }
+					
+                }) ;*/
+				$.when(
+				   $.each(sheet_name_list, function (key, y) {
+						// Do Something in loop here
+						console.log(y);
+						var roa = XLSX.utils.sheet_to_json(workbook.Sheets[y]);
+						if (roa.length > 0) {
+							result = roa;
+						}
+					})
+				  ).then(function () {
+					   // After loop ends.
+					    console.log(result);
+				  });
+				
+				//.done( function(){ console.log(result);alert("All was done"); } );
+               //Get the first column first cell value
+			 //  console.log(result);
+                alert(result[0].Test1);
+            };
+            reader.readAsArrayBuffer(f);
+        }
+    }
+
+  //Change event to dropdownlist
+  $(document).ready(function(){
+    $('#files').change(handleFile);
+  });
+</script>
+
+<input type="file" id="files" name="files"/>
